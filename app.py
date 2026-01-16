@@ -11,10 +11,10 @@ from xps_twin.models.twin_engine import DigitalTwinEngine
 from xps_twin.analysis.deconvolution import XPSDeconvolver
 from xps_twin.core.physics import fermi_dirac
 
-st.set_page_config(page_title="XPS Digital Twin Lab", layout="wide")
+st.set_page_config(page_title="XPS IRF Simulator", layout="wide")
 
-st.title("🔬 XPS Digital Twin & Deconvolution Lab")
-st.markdown("装置の幾何学的歪みをパラメタライズし、真の電子状態を復元します。")
+st.title("🔬 XPS IRF Simulator & Resolution Explorer")
+st.markdown("装置の幾何学的歪みをパラメタライズし、IRFの非対称性を可視化します。")
 
 # --- サイドバー: 思想・背景 ---
 with st.sidebar.expander("📖 このシミュレータの思想", expanded=False):

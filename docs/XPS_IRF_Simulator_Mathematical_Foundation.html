@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPS IRF Simulator & Resolution Explorer - Mathematical Foundation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --accent: #059669;
+            --warning: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            padding: 2rem;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--card);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.5rem;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .lang-toggle button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .lang-toggle button.active {
+            background: var(--primary);
+            color: white;
+        }
+        .lang-toggle button:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+        /* Content sections */
+        .ja-content, .en-content { display: none; }
+        .ja-content.active, .en-content.active { display: block; }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .app-link {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 1rem 0;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .app-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        h2 {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin: 2rem 0 1rem;
+            padding-left: 0.8rem;
+            border-left: 4px solid var(--secondary);
+        }
+        h3 {
+            font-size: 1.15rem;
+            color: var(--accent);
+            margin: 1.5rem 0 0.8rem;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .equation-box {
+            background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        .equation-box.final {
+            background: linear-gradient(135deg, #fef3c7, #fce7f3);
+            border-color: #f59e0b;
+        }
+        .equation-box.unified {
+            background: linear-gradient(135deg, #fdf2f8, #faf5ff);
+            border: 3px solid var(--secondary);
+            padding: 2rem;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .param-table th, .param-table td {
+            padding: 0.5rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .param-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .param-table tr:hover { background: #f8fafc; }
+        .code-inline {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            color: #be185d;
+        }
+        .note {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .note.info {
+            background: #eff6ff;
+            border-left-color: var(--primary);
+        }
+        .note.success {
+            background: #f0fdf4;
+            border-left-color: var(--accent);
+        }
+        .verification {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .verification-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.3rem 0;
+        }
+        .check { color: #22c55e; font-weight: bold; }
+        .warn { color: #f59e0b; font-weight: bold; }
+        .toc {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .toc h3 { margin-top: 0; }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin: 0.4rem 0; }
+        .toc a { color: var(--primary); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+        .flowchart {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+        .flow-box {
+            display: inline-block;
+            background: #eff6ff;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            font-size: 0.95rem;
+        }
+        .novelty-box {
+            background: linear-gradient(135deg, #fef3c7, #fce7f3);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .novelty-box h3 {
+            color: var(--warning);
+            margin-top: 0;
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="lang-toggle">
+        <button id="btn-ja" class="active" onclick="setLang('ja')">日本語</button>
+        <button id="btn-en" onclick="setLang('en')">English</button>
+    </div>
+
+    <div class="container">
+        <!-- ==================== 日本語版 ==================== -->
+        <div class="ja-content active">
+            <h1>🔬 XPS IRF Simulator & Resolution Explorer</h1>
+            <p class="subtitle">数学的基礎と装置関数の厳密な記述</p>
+            <a href="https://xpstwin.streamlit.app" target="_blank" class="app-link">▶ アプリを開く (Streamlit)</a>
+
+            <div class="toc">
+                <h3>目次</h3>
+                <ul>
+                    <li><a href="#ja-overview">1. 概要：なぜこのアプローチが新しいか</a></li>
+                    <li><a href="#ja-flow">2. シミュレーションの流れ</a></li>
+                    <li><a href="#ja-fermi">3. フェルミ・ディラック分布</a></li>
+                    <li><a href="#ja-source">4. X線光源のモデル化</a></li>
+                    <li><a href="#ja-detector">5. 検出器のモデル化</a></li>
+                    <li><a href="#ja-noise">6. ノイズモデル</a></li>
+                    <li><a href="#ja-unified">7. 統一的な数式表現</a></li>
+                    <li><a href="#ja-verification">8. 実装の検証</a></li>
+                    <li><a href="#ja-references">9. 参考文献</a></li>
+                </ul>
+            </div>
+
+            <!-- Section 1 -->
+            <h2 id="ja-overview">1. 概要：なぜこのアプローチが新しいか</h2>
+
+            <div class="novelty-box">
+                <h3>🎯 従来手法との違い</h3>
+                <table class="param-table">
+                    <tr><th>従来のアプローチ</th><th>本シミュレータ</th></tr>
+                    <tr><td>装置関数 = ガウシアン（ブラックボックス）</td><td>幾何学的要因を分解してパラメータ化</td></tr>
+                    <tr><td>結果（FWHM）だけ測定</td><td>原因（κ, θ, α, σ等）を個別に制御</td></tr>
+                    <tr><td>メーカー任せの補正</td><td>Forward/Inverse モデルを自分で構築</td></tr>
+                    <tr><td>1D畳み込みのみ</td><td>2D空間積分 + 座標変換</td></tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <p>XPS装置メーカー（Scienta Omicron, SPECS等）は幾何学的補正を実装していますが、その詳細は公開されていません。本シミュレータは、これらの効果を<strong>物理的に分解し、パラメータ化</strong>することで、装置関数の「中身」を理解可能にします。</p>
+            </div>
+
+            <!-- Section 2 -->
+            <h2 id="ja-flow">2. シミュレーションの流れ</h2>
+
+            <div class="flowchart">
+                <div class="flow-box">真の物性<br>\(f_{\text{FD}}(E, T)\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">X線光源による2D発光<br>\(I_{\text{source}}(E, y)\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">検出器歪み＋座標変換<br>\(\mathcal{D}_{\kappa,\theta}\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Y軸積分＋分解能畳み込み</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">観測スペクトル<br>\(S_{\text{obs}}(E)\)</div>
+            </div>
+
+            <!-- Section 3 -->
+            <h2 id="ja-fermi">3. フェルミ・ディラック分布</h2>
+
+            <div class="equation-box">
+                \[
+                f_{\text{FD}}(E, T) = \frac{1}{1 + \exp\left(\frac{E - E_F}{k_B T}\right)}
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>パラメータ</th><th>説明</th><th>値</th></tr>
+                <tr><td>\(k_B\)</td><td>ボルツマン定数</td><td>\(8.617333262 \times 10^{-5}\) eV/K</td></tr>
+                <tr><td>\(T\)</td><td>試料温度</td><td>UI: Temperature (K)</td></tr>
+                <tr><td>\(E_F\)</td><td>フェルミエネルギー</td><td>基準点 (0 eV)</td></tr>
+            </table>
+
+            <!-- Section 4 -->
+            <h2 id="ja-source">4. X線光源のモデル化</h2>
+
+            <h3>4.1 非対称ガウス分布（Skew-Normal）</h3>
+
+            <div class="equation-box">
+                \[
+                \phi_\gamma(x; \sigma, \gamma) = 2 \cdot \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{x^2}{2\sigma^2}\right) \cdot \frac{1}{2}\left[1 + \text{erf}\left(\frac{\gamma x}{\sigma\sqrt{2}}\right)\right]
+                \]
+            </div>
+
+            <h3>4.2 2D楕円ガウス分布（回転対応）</h3>
+
+            <p><strong>回転変換：</strong></p>
+            <div class="equation-box">
+                \[
+                \begin{pmatrix} E' \\ y' \end{pmatrix} =
+                \begin{pmatrix} \cos\theta_{\text{rot}} & -\sin\theta_{\text{rot}} \\ \sin\theta_{\text{rot}} & \cos\theta_{\text{rot}} \end{pmatrix}
+                \begin{pmatrix} E \\ y \end{pmatrix}
+                \]
+            </div>
+
+            <h3>4.3 2D発光像の生成</h3>
+
+            <div class="equation-box">
+                \[
+                I_{\text{source}}(E, y) = f_{\text{FD}}(E - \alpha y, T) \cdot \phi_{\gamma_y}(y; \sigma_y, \gamma_y)
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>パラメータ</th><th>説明</th><th>UI名</th></tr>
+                <tr><td>\(\sigma_x\)</td><td>エネルギー方向スポットサイズ</td><td>Spot Size X (meV)</td></tr>
+                <tr><td>\(\sigma_y\)</td><td>空間方向スポットサイズ</td><td>Spot Size Y (mm)</td></tr>
+                <tr><td>\(\gamma_x, \gamma_y\)</td><td>非対称性パラメータ</td><td>Spot Skew X/Y</td></tr>
+                <tr><td>\(\theta_{\text{rot}}\)</td><td>スポット回転角度</td><td>Spot Rotation (deg)</td></tr>
+                <tr><td>\(\alpha\)</td><td>エネルギー勾配 (dE/dy)</td><td>Energy Gradient</td></tr>
+            </table>
+
+            <!-- Section 5 -->
+            <h2 id="ja-detector">5. 検出器のモデル化</h2>
+
+            <h3>5.1 幾何学的歪み</h3>
+
+            <div class="equation-box">
+                \[
+                E_{\text{src}} = E \cos\theta_{\text{tilt}} + y \sin\theta_{\text{tilt}}
+                \]
+                \[
+                E_{\text{curved}} = E_{\text{src}} - \kappa \left(\frac{y}{y_{\max}}\right)^2
+                \]
+            </div>
+
+            <div class="note">
+                <strong>スマイル歪み (κ):</strong> 半球型アナライザーの球面収差により、等エネルギー線が湾曲する効果。Y軸積分後に高BE側へ伸びる非対称な裾野を生成します。
+            </div>
+
+            <h3>5.2 1D投影と分解能畳み込み</h3>
+
+            <div class="equation-box">
+                \[
+                S_{\text{obs}}(E) = \left[\int_{-\infty}^{\infty} I_{\text{distorted}}(E, y) \, dy\right] \ast G_{\text{res}}(E; \sigma_{\text{res}})
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>パラメータ</th><th>説明</th><th>UI名</th></tr>
+                <tr><td>\(\kappa\)</td><td>スマイル曲率係数</td><td>Smile Curvature</td></tr>
+                <tr><td>\(\theta_{\text{tilt}}\)</td><td>検出器傾き角度</td><td>Detector Tilt (deg)</td></tr>
+                <tr><td>\(\sigma_{\text{res}}\)</td><td>装置固有分解能</td><td>Intrinsic Res (meV)</td></tr>
+            </table>
+
+            <!-- Section 6 -->
+            <h2 id="ja-noise">6. ノイズモデル</h2>
+
+            <div class="equation-box">
+                \[
+                S_{\text{final}}(E) = \frac{\text{Poisson}\left(S_{\text{clean}} \cdot \lambda\right)}{\lambda} + \mathcal{N}(0, \sigma_{\text{readout}})
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>ノイズ種別</th><th>特性</th><th>UI名</th></tr>
+                <tr><td>ポアソンノイズ</td><td>信号強度依存（ショットノイズ）</td><td>Poisson Noise Level</td></tr>
+                <tr><td>ガウシアンノイズ</td><td>信号強度非依存（読み出しノイズ）</td><td>Gaussian Readout Noise</td></tr>
+            </table>
+
+            <!-- Section 7 -->
+            <h2 id="ja-unified">7. 統一的な数式表現</h2>
+
+            <div class="equation-box unified">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">完全な観測スペクトル</h3>
+                \[
+                \boxed{
+                S_{\text{obs}}(E) = \left[ \int_{-\infty}^{\infty} f_{\text{FD}}\left(\mathcal{T}(E, y; \kappa, \theta) - \alpha y, T\right) \cdot \phi_{\gamma_y}(y; \sigma_y, \gamma_y) \, dy \right] \ast G_{\text{res}}(E; \sigma_{\text{res}}) + \eta(E)
+                }
+                \]
+            </div>
+
+            <p>ここで座標変換は：</p>
+            <div class="equation-box">
+                \[
+                \mathcal{T}(E, y; \kappa, \theta) = \left(E \cos\theta + y \sin\theta\right) - \kappa \left(\frac{y}{y_{\max}}\right)^2
+                \]
+            </div>
+
+            <h3>演算子表記</h3>
+            <div class="equation-box final">
+                \[
+                S_{\text{obs}} = \mathcal{P}_y \left[ \mathcal{D}_{\kappa,\theta} \left[ \mathcal{S}_\alpha \left[ f_{\text{FD}} \right] \cdot W_y \right] \right] \ast G_{\text{res}} + \eta
+                \]
+            </div>
+
+            <!-- Section 8 -->
+            <h2 id="ja-verification">8. 実装の検証</h2>
+
+            <div class="verification">
+                <h3 style="margin-top: 0;">✓ 検証済み項目</h3>
+                <div class="verification-item"><span class="check">✓</span> ボルツマン定数: CODATA 2018準拠</div>
+                <div class="verification-item"><span class="check">✓</span> フェルミ・ディラック式: 標準形式</div>
+                <div class="verification-item"><span class="check">✓</span> 歪正規分布: 係数2を含む正しい定義</div>
+                <div class="verification-item"><span class="check">✓</span> 回転行列: 反時計回り正（標準）</div>
+                <div class="verification-item"><span class="check">✓</span> スマイル歪み: y²依存（球面収差の一次近似）</div>
+                <div class="verification-item"><span class="warn">⚠</span> 2Dスキューガウス: 1D積の近似（実用上十分）</div>
+            </div>
+
+            <div class="note info">
+                <strong>文献との整合性:</strong> 装置関数をVoigt関数（ガウシアン×ローレンツィアン）で扱う文献は存在しますが、幾何学的要因を個別にパラメータ化した公開文献は見当たりません。装置メーカーは補正を実装していますが、詳細は非公開です。
+            </div>
+
+            <!-- Section 9 -->
+            <h2 id="ja-references">9. 参考文献</h2>
+
+            <div class="card">
+                <ul style="list-style: disc; padding-left: 1.5rem;">
+                    <li>Jain, V. et al., <em>Applied Surface Science</em> 447, 548-553 (2018) - Voigt関数とXPS</li>
+                    <li>Hemispherical Analyzer - <a href="https://en.wikipedia.org/wiki/Hemispherical_electron_energy_analyzer" target="_blank">Wikipedia</a></li>
+                    <li>Scienta Omicron - <a href="https://scientaomicron.com/en/Instruments/Electron-Analysers" target="_blank">Electron Analysers</a></li>
+                    <li>SPECS Group - <a href="https://www.specs-group.com/specs/products/" target="_blank">Products</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ==================== English Version ==================== -->
+        <div class="en-content">
+            <h1>🔬 XPS IRF Simulator & Resolution Explorer</h1>
+            <p class="subtitle">Mathematical Foundation and Rigorous Description of Instrumental Response</p>
+            <a href="https://xpstwin.streamlit.app" target="_blank" class="app-link">▶ Open App (Streamlit)</a>
+
+            <div class="toc">
+                <h3>Table of Contents</h3>
+                <ul>
+                    <li><a href="#en-overview">1. Overview: Why This Approach is Novel</a></li>
+                    <li><a href="#en-flow">2. Simulation Pipeline</a></li>
+                    <li><a href="#en-fermi">3. Fermi-Dirac Distribution</a></li>
+                    <li><a href="#en-source">4. X-ray Source Modeling</a></li>
+                    <li><a href="#en-detector">5. Detector Modeling</a></li>
+                    <li><a href="#en-noise">6. Noise Model</a></li>
+                    <li><a href="#en-unified">7. Unified Mathematical Expression</a></li>
+                    <li><a href="#en-verification">8. Implementation Verification</a></li>
+                    <li><a href="#en-references">9. References</a></li>
+                </ul>
+            </div>
+
+            <!-- Section 1 -->
+            <h2 id="en-overview">1. Overview: Why This Approach is Novel</h2>
+
+            <div class="novelty-box">
+                <h3>🎯 Comparison with Conventional Methods</h3>
+                <table class="param-table">
+                    <tr><th>Conventional Approach</th><th>This Simulator</th></tr>
+                    <tr><td>IRF = Gaussian (black box)</td><td>Decomposed geometric factors with parametrization</td></tr>
+                    <tr><td>Measure only results (FWHM)</td><td>Control individual causes (κ, θ, α, σ, etc.)</td></tr>
+                    <tr><td>Vendor-dependent corrections</td><td>Build your own Forward/Inverse model</td></tr>
+                    <tr><td>1D convolution only</td><td>2D spatial integration + coordinate transform</td></tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <p>XPS instrument manufacturers (Scienta Omicron, SPECS, etc.) implement geometric corrections, but the details are proprietary. This simulator <strong>decomposes and parametrizes</strong> these effects, making the "internals" of the instrumental function understandable and controllable.</p>
+            </div>
+
+            <!-- Section 2 -->
+            <h2 id="en-flow">2. Simulation Pipeline</h2>
+
+            <div class="flowchart">
+                <div class="flow-box">True Physics<br>\(f_{\text{FD}}(E, T)\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">X-ray Source 2D Emission<br>\(I_{\text{source}}(E, y)\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Detector Distortion + Transform<br>\(\mathcal{D}_{\kappa,\theta}\)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Y-axis Integration + Resolution Convolution</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Observed Spectrum<br>\(S_{\text{obs}}(E)\)</div>
+            </div>
+
+            <!-- Section 3 -->
+            <h2 id="en-fermi">3. Fermi-Dirac Distribution</h2>
+
+            <div class="equation-box">
+                \[
+                f_{\text{FD}}(E, T) = \frac{1}{1 + \exp\left(\frac{E - E_F}{k_B T}\right)}
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>Parameter</th><th>Description</th><th>Value</th></tr>
+                <tr><td>\(k_B\)</td><td>Boltzmann constant</td><td>\(8.617333262 \times 10^{-5}\) eV/K</td></tr>
+                <tr><td>\(T\)</td><td>Sample temperature</td><td>UI: Temperature (K)</td></tr>
+                <tr><td>\(E_F\)</td><td>Fermi energy</td><td>Reference (0 eV)</td></tr>
+            </table>
+
+            <!-- Section 4 -->
+            <h2 id="en-source">4. X-ray Source Modeling</h2>
+
+            <h3>4.1 Skew-Normal Distribution</h3>
+
+            <div class="equation-box">
+                \[
+                \phi_\gamma(x; \sigma, \gamma) = 2 \cdot \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{x^2}{2\sigma^2}\right) \cdot \frac{1}{2}\left[1 + \text{erf}\left(\frac{\gamma x}{\sigma\sqrt{2}}\right)\right]
+                \]
+            </div>
+
+            <h3>4.2 2D Elliptical Gaussian with Rotation</h3>
+
+            <p><strong>Rotation Transform:</strong></p>
+            <div class="equation-box">
+                \[
+                \begin{pmatrix} E' \\ y' \end{pmatrix} =
+                \begin{pmatrix} \cos\theta_{\text{rot}} & -\sin\theta_{\text{rot}} \\ \sin\theta_{\text{rot}} & \cos\theta_{\text{rot}} \end{pmatrix}
+                \begin{pmatrix} E \\ y \end{pmatrix}
+                \]
+            </div>
+
+            <h3>4.3 2D Emission Image Generation</h3>
+
+            <div class="equation-box">
+                \[
+                I_{\text{source}}(E, y) = f_{\text{FD}}(E - \alpha y, T) \cdot \phi_{\gamma_y}(y; \sigma_y, \gamma_y)
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>Parameter</th><th>Description</th><th>UI Label</th></tr>
+                <tr><td>\(\sigma_x\)</td><td>Energy-direction spot size</td><td>Spot Size X (meV)</td></tr>
+                <tr><td>\(\sigma_y\)</td><td>Spatial-direction spot size</td><td>Spot Size Y (mm)</td></tr>
+                <tr><td>\(\gamma_x, \gamma_y\)</td><td>Asymmetry parameters</td><td>Spot Skew X/Y</td></tr>
+                <tr><td>\(\theta_{\text{rot}}\)</td><td>Spot rotation angle</td><td>Spot Rotation (deg)</td></tr>
+                <tr><td>\(\alpha\)</td><td>Energy gradient (dE/dy)</td><td>Energy Gradient</td></tr>
+            </table>
+
+            <!-- Section 5 -->
+            <h2 id="en-detector">5. Detector Modeling</h2>
+
+            <h3>5.1 Geometric Distortion</h3>
+
+            <div class="equation-box">
+                \[
+                E_{\text{src}} = E \cos\theta_{\text{tilt}} + y \sin\theta_{\text{tilt}}
+                \]
+                \[
+                E_{\text{curved}} = E_{\text{src}} - \kappa \left(\frac{y}{y_{\max}}\right)^2
+                \]
+            </div>
+
+            <div class="note">
+                <strong>Smile Distortion (κ):</strong> Due to spherical aberration in hemispherical analyzers, iso-energy lines become curved. After Y-axis integration, this produces an asymmetric tail extending toward higher binding energy.
+            </div>
+
+            <h3>5.2 1D Projection and Resolution Convolution</h3>
+
+            <div class="equation-box">
+                \[
+                S_{\text{obs}}(E) = \left[\int_{-\infty}^{\infty} I_{\text{distorted}}(E, y) \, dy\right] \ast G_{\text{res}}(E; \sigma_{\text{res}})
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>Parameter</th><th>Description</th><th>UI Label</th></tr>
+                <tr><td>\(\kappa\)</td><td>Smile curvature coefficient</td><td>Smile Curvature</td></tr>
+                <tr><td>\(\theta_{\text{tilt}}\)</td><td>Detector tilt angle</td><td>Detector Tilt (deg)</td></tr>
+                <tr><td>\(\sigma_{\text{res}}\)</td><td>Intrinsic resolution</td><td>Intrinsic Res (meV)</td></tr>
+            </table>
+
+            <!-- Section 6 -->
+            <h2 id="en-noise">6. Noise Model</h2>
+
+            <div class="equation-box">
+                \[
+                S_{\text{final}}(E) = \frac{\text{Poisson}\left(S_{\text{clean}} \cdot \lambda\right)}{\lambda} + \mathcal{N}(0, \sigma_{\text{readout}})
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>Noise Type</th><th>Characteristics</th><th>UI Label</th></tr>
+                <tr><td>Poisson noise</td><td>Signal-dependent (shot noise)</td><td>Poisson Noise Level</td></tr>
+                <tr><td>Gaussian noise</td><td>Signal-independent (readout noise)</td><td>Gaussian Readout Noise</td></tr>
+            </table>
+
+            <!-- Section 7 -->
+            <h2 id="en-unified">7. Unified Mathematical Expression</h2>
+
+            <div class="equation-box unified">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">Complete Observed Spectrum</h3>
+                \[
+                \boxed{
+                S_{\text{obs}}(E) = \left[ \int_{-\infty}^{\infty} f_{\text{FD}}\left(\mathcal{T}(E, y; \kappa, \theta) - \alpha y, T\right) \cdot \phi_{\gamma_y}(y; \sigma_y, \gamma_y) \, dy \right] \ast G_{\text{res}}(E; \sigma_{\text{res}}) + \eta(E)
+                }
+                \]
+            </div>
+
+            <p>Where the coordinate transform is:</p>
+            <div class="equation-box">
+                \[
+                \mathcal{T}(E, y; \kappa, \theta) = \left(E \cos\theta + y \sin\theta\right) - \kappa \left(\frac{y}{y_{\max}}\right)^2
+                \]
+            </div>
+
+            <h3>Operator Notation</h3>
+            <div class="equation-box final">
+                \[
+                S_{\text{obs}} = \mathcal{P}_y \left[ \mathcal{D}_{\kappa,\theta} \left[ \mathcal{S}_\alpha \left[ f_{\text{FD}} \right] \cdot W_y \right] \right] \ast G_{\text{res}} + \eta
+                \]
+            </div>
+
+            <!-- Section 8 -->
+            <h2 id="en-verification">8. Implementation Verification</h2>
+
+            <div class="verification">
+                <h3 style="margin-top: 0;">✓ Verified Items</h3>
+                <div class="verification-item"><span class="check">✓</span> Boltzmann constant: CODATA 2018 compliant</div>
+                <div class="verification-item"><span class="check">✓</span> Fermi-Dirac formula: Standard form</div>
+                <div class="verification-item"><span class="check">✓</span> Skew-normal distribution: Correct definition with factor of 2</div>
+                <div class="verification-item"><span class="check">✓</span> Rotation matrix: Counterclockwise positive (standard)</div>
+                <div class="verification-item"><span class="check">✓</span> Smile distortion: y² dependence (first-order spherical aberration)</div>
+                <div class="verification-item"><span class="warn">⚠</span> 2D skew-Gaussian: Product of 1D approximation (sufficient for practical use)</div>
+            </div>
+
+            <div class="note info">
+                <strong>Literature Consistency:</strong> While literature treating the IRF as a Voigt function (Gaussian × Lorentzian) exists, no published work parametrizing individual geometric factors was found. Instrument manufacturers implement corrections, but details remain proprietary.
+            </div>
+
+            <!-- Section 9 -->
+            <h2 id="en-references">9. References</h2>
+
+            <div class="card">
+                <ul style="list-style: disc; padding-left: 1.5rem;">
+                    <li>Jain, V. et al., <em>Applied Surface Science</em> 447, 548-553 (2018) - Voigt functions in XPS</li>
+                    <li>Hemispherical Analyzer - <a href="https://en.wikipedia.org/wiki/Hemispherical_electron_energy_analyzer" target="_blank">Wikipedia</a></li>
+                    <li>Scienta Omicron - <a href="https://scientaomicron.com/en/Instruments/Electron-Analysers" target="_blank">Electron Analysers</a></li>
+                    <li>SPECS Group - <a href="https://www.specs-group.com/specs/products/" target="_blank">Products</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p><strong>XPS IRF Simulator & Resolution Explorer</strong></p>
+            <p>Author: Satoshi Toyoda | <a href="https://github.com/stoyoda0012-cyber/XPSTwin_streamlit" target="_blank">GitHub Repository</a></p>
+            <p>App: <a href="https://xpstwin.streamlit.app" target="_blank">https://xpstwin.streamlit.app</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            document.querySelectorAll('.ja-content, .en-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-toggle button').forEach(el => el.classList.remove('active'));
+
+            document.querySelector('.' + lang + '-content').classList.add('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang === 'ja' ? 'ja' : 'en';
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# XPS Digital Twin Simulator
+# XPS_IRF_Simulator
 
-XPS (X-ray Photoelectron Spectroscopy) Digital Twin Simulator with advanced deconvolution analysis.
+XPS (X-ray Photoelectron Spectroscopy) IRF Simulator & Resolution Explorer with advanced deconvolution analysis.
 
 ## Features
 
@@ -23,7 +23,11 @@ streamlit run app.py
 
 ### Online Demo
 
-Visit the live app: [XPS Digital Twin Simulator](https://xpstwin.streamlit.app)
+Visit the live app: [XPS_IRF_Simulator](https://xpstwin.streamlit.app)
+
+### Documentation
+
+- [Mathematical Foundation](https://stoyoda0012-cyber.github.io/XPSTwin_streamlit/XPS_IRF_Simulator_Mathematical_Foundation.html) - Detailed mathematical basis and implementation notes
 
 ## Usage
 
@@ -105,7 +109,7 @@ XPSTwin_streamlit/
 If you use this simulator in your research, please cite:
 
 ```
-XPS Digital Twin Simulator
+XPS_IRF_Simulator & Resolution Explorer
 https://github.com/stoyoda0012-cyber/XPSTwin_streamlit
 ```
 

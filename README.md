@@ -23,7 +23,7 @@ streamlit run app.py
 
 ### Online Demo
 
-Visit the live app: [XPS_IRF_Simulator](https://xpstwin.streamlit.app)
+Visit the live app: [XPS_IRF_Simulator](https://xpstwinapp-fu3hrc35prlzqzncvmfaho.streamlit.app)
 
 ### Documentation
 

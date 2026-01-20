@@ -384,6 +384,27 @@
                 <tr><td>\(\sigma_{\text{res}}\)</td><td>装置固有分解能</td><td>Intrinsic Res (meV)</td></tr>
             </table>
 
+            <h3>5.3 分解能の合成</h3>
+
+            <p>本シミュレータでは、ソース分解能と検出器分解能を<strong>独立に畳み込み</strong>、合成分解能を以下の式で計算します：</p>
+
+            <div class="equation-box">
+                \[
+                \sigma_{\text{combined}} = \sqrt{\sigma_{\text{source}}^2 + \sigma_{\text{detector}}^2}
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>成分</th><th>説明</th><th>UI名</th></tr>
+                <tr><td>\(\sigma_{\text{source}}\)</td><td>X線源のエネルギー方向分解能</td><td>Source Resolution (meV)</td></tr>
+                <tr><td>\(\sigma_{\text{detector}}\)</td><td>検出器の固有分解能</td><td>Detector Resolution (meV)</td></tr>
+                <tr><td>\(\sigma_{\text{combined}}\)</td><td>合成分解能（二乗和平方根）</td><td>Combined Resolution</td></tr>
+            </table>
+
+            <div class="note success">
+                <strong>物理的意味:</strong> 2つの独立したガウシアン畳み込みの合成はガウシアンとなり、その標準偏差は各成分の二乗和の平方根になります。これにより、ソース分解能と検出器分解能の寄与を定量的に分離できます。
+            </div>
+
             <!-- Section 6 -->
             <h2 id="ja-noise">6. ノイズモデル</h2>
 
@@ -597,6 +618,27 @@
                 <tr><td>\(\theta_{\text{tilt}}\)</td><td>Detector tilt angle</td><td>Detector Tilt (deg)</td></tr>
                 <tr><td>\(\sigma_{\text{res}}\)</td><td>Intrinsic resolution</td><td>Intrinsic Res (meV)</td></tr>
             </table>
+
+            <h3>5.3 Resolution Combination</h3>
+
+            <p>This simulator applies source resolution and detector resolution as <strong>independent convolutions</strong>, and calculates the combined resolution using:</p>
+
+            <div class="equation-box">
+                \[
+                \sigma_{\text{combined}} = \sqrt{\sigma_{\text{source}}^2 + \sigma_{\text{detector}}^2}
+                \]
+            </div>
+
+            <table class="param-table">
+                <tr><th>Component</th><th>Description</th><th>UI Label</th></tr>
+                <tr><td>\(\sigma_{\text{source}}\)</td><td>X-ray source energy resolution</td><td>Source Resolution (meV)</td></tr>
+                <tr><td>\(\sigma_{\text{detector}}\)</td><td>Detector intrinsic resolution</td><td>Detector Resolution (meV)</td></tr>
+                <tr><td>\(\sigma_{\text{combined}}\)</td><td>Combined resolution (root sum of squares)</td><td>Combined Resolution</td></tr>
+            </table>
+
+            <div class="note success">
+                <strong>Physical Meaning:</strong> The convolution of two independent Gaussians results in a Gaussian whose standard deviation is the square root of the sum of squares of each component. This allows quantitative separation of source and detector resolution contributions.
+            </div>
 
             <!-- Section 6 -->
             <h2 id="en-noise">6. Noise Model</h2>

@@ -224,7 +224,10 @@ class XPSDeconvolver:
         # 各要素の分解能への寄与を推定
         # （簡易的な計算: より正確には2Dシミュレーションが必要）
 
-        # Detector intrinsic resolution
+        # Source resolution (X方向のエネルギー広がり) - 主要な成分
+        contrib_source = sigma_x
+
+        # Detector intrinsic resolution - 主要な成分
         contrib_detector_res = sigma_res
 
         # Smile curvature contribution (非線形効果の近似)
@@ -234,31 +237,34 @@ class XPSDeconvolver:
         # Detector tilt contribution
         contrib_tilt = abs(theta) * 0.001  # 経験的な係数
 
-        # Source size contribution (X方向)
-        contrib_source_x = sigma_x
-
         # Energy gradient contribution
         contrib_gradient = abs(alpha) * sigma_y * 0.1  # 空間とエネルギーのカップリング
 
         # 非対称性の寄与（RMS的に合算）
         contrib_asymmetry = np.sqrt((gamma_x * 0.0001)**2 + (gamma_y * 0.0001)**2)
 
-        # 合計分解能（各寄与を二乗和平方根で結合）
+        # 合成分解能（ソース分解能と検出器分解能の二乗和平方根）
+        # これがReactアプリと同じ計算: σ = √(σ_source² + σ_detector²)
+        sigma_combined = np.sqrt(contrib_source**2 + contrib_detector_res**2)
+
+        # 合計分解能（すべての成分を含む）
         total_resolution = np.sqrt(
+            contrib_source**2 +
             contrib_detector_res**2 +
             contrib_smile**2 +
             contrib_tilt**2 +
-            contrib_source_x**2 +
             contrib_gradient**2 +
             contrib_asymmetry**2
         )
 
         return {
             'total_resolution': total_resolution,
+            'source_resolution': contrib_source,
             'detector_intrinsic': contrib_detector_res,
+            'combined_resolution': sigma_combined,  # σ = √(σ_source² + σ_detector²)
             'smile_curvature': contrib_smile,
             'detector_tilt': contrib_tilt,
-            'source_size_x': contrib_source_x,
+            'source_size_x': contrib_source,  # 後方互換性のため残す
             'energy_gradient': contrib_gradient,
             'asymmetry': contrib_asymmetry
         }

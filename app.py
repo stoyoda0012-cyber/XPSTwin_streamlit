@@ -604,6 +604,28 @@ In high-resolution XPS, slight alignment errors produce
         True: "Parameter Comparison (True vs Estimated)",
         False: "パラメータ比較（真の値 vs 推定値）"
     },
+
+    # Resolution Summary
+    "resolution_summary_title": {
+        True: "📊 Resolution Summary",
+        False: "📊 分解能サマリー"
+    },
+    "source_resolution_label": {
+        True: "Source Resolution",
+        False: "ソース分解能"
+    },
+    "detector_resolution_label": {
+        True: "Detector Resolution",
+        False: "検出器分解能"
+    },
+    "combined_resolution_label": {
+        True: "Combined Resolution",
+        False: "合成分解能"
+    },
+    "resolution_formula_note": {
+        True: "σ = √(σ_source² + σ_detector²)",
+        False: "σ = √(σ_source² + σ_detector²)"
+    },
 }
 
 # Helper function to get translated text
@@ -715,6 +737,26 @@ if poisson_noise <= 1e-5 and gaussian_noise == 0.0:
 # 測定条件
 st.sidebar.subheader("Measurement")
 temp = st.sidebar.slider("Temperature (K)", 0.1, 300.0, 5.0)
+
+st.sidebar.divider()
+
+# --- Resolution Summary ---
+st.sidebar.subheader(t("resolution_summary_title"))
+
+# 分解能の計算（meV単位）
+sigma_source_mev = sigma_x  # 既にmeV
+sigma_detector_mev = sigma_res_mev * 1000.0  # eV -> meV
+sigma_combined_mev = np.sqrt(sigma_source_mev**2 + sigma_detector_mev**2)
+
+# 分解能の表示
+col_res1, col_res2 = st.sidebar.columns(2)
+with col_res1:
+    st.metric(t("source_resolution_label"), f"{sigma_source_mev:.2f} meV")
+with col_res2:
+    st.metric(t("detector_resolution_label"), f"{sigma_detector_mev:.2f} meV")
+
+st.sidebar.metric(t("combined_resolution_label"), f"{sigma_combined_mev:.2f} meV")
+st.sidebar.caption(t("resolution_formula_note"))
 
 st.sidebar.divider()
 
